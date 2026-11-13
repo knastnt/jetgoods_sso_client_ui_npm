@@ -34,9 +34,10 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     accessToken: null,
     refreshPromise: null,
-    organizations: [],
-    selectedOrganizationId: null,
-  }),
+      user: null,
+      organizations: [],
+      selectedOrganizationId: null,
+    }),
 
   getters: {
     isAuthenticated: (state) => !!state.accessToken,
@@ -47,12 +48,13 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    setTokens(accessToken, organizations = []) {
+    setTokens(accessToken, organizations = [], user = null) {
       console.debug('[authStore] Setting access token and organizations')
       this.accessToken = accessToken
-      this.organizations = organizations
-      this.selectOrganization(organizations)
-    },
+          this.user = user
+          this.organizations = organizations
+          this.selectOrganization(organizations)
+        },
 
     selectOrganization(organizations) {
       const savedOrgId = Cookies.get('selected_organization_id')
@@ -86,10 +88,11 @@ export const useAuthStore = defineStore('auth', {
     clearTokens() {
       console.debug('[authStore] Clearing tokens')
       this.accessToken = null
-      this.refreshPromise = null
-      this.organizations = []
-      this.selectedOrganizationId = null
-    },
+          this.user = null
+          this.refreshPromise = null
+          this.organizations = []
+          this.selectedOrganizationId = null
+        },
 
     async login() {
       try {
@@ -129,7 +132,7 @@ export const useAuthStore = defineStore('auth', {
         try {
           const response = await api.post('/auth/token_proxy')
           const data = response.data
-          this.setTokens(data.access_token, data.organizations || [])
+                    this.setTokens(data.access_token, data.organizations || [], data.user || null)
           console.info('[authStore] Token refresh successful')
           return true
         } catch (error) {
