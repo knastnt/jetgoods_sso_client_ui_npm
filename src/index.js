@@ -6,5 +6,6 @@
 export { createSsoApi, api } from './boot/ssoAxios.js'
 export { useAuthStore } from './stores/authStore.js'
 export { createAuthGuard, createAuthGuard as authGuard } from './router/authGuard.js'
+export { createSsoAuth, createSsoSession } from './sso/authClient.js'
 export { default as CookieConsent } from './components/CookieConsent.vue'
 export { default as LoginPage } from './pages/LoginPage.vue'
