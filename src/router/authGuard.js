@@ -65,9 +65,3 @@ export const createAuthGuard = ({
         return refreshed ? true : redirectTo
     }
 }
-
-/**
- * Guard с настройками по умолчанию.
- * Оставлен для обратной совместимости: Router.beforeEach(authGuard)
- */
-export const authGuard = createAuthGuard()
