@@ -13,7 +13,7 @@ npm install git+https://github.com/knastnt/jetgoods-sso-ui.git
 ## Использование
 
 ```js
-import { createSsoApi, useAuthStore, authGuard, LoginPage, LoginLayout, CookieConsent } from 'jetgoods-sso-ui'
+import { createSsoApi, useAuthStore, createAuthGuard, authGuard, LoginPage, LoginLayout, CookieConsent } from 'jetgoods-sso-ui'
 ```
 
 ### 1. Подключить boot-файл
@@ -40,9 +40,11 @@ export { api }
 ### 3. Подключить authGuard
 
 ```js
-import { authGuard } from 'jetgoods-sso-ui'
+import { createAuthGuard } from 'jetgoods-sso-ui'
 
-Router.beforeEach(authGuard)
+Router.beforeEach(createAuthGuard({
+  publicRoutes: ['/', '/api-docs']
+}))
 ```
 
 ### 4. Добавить маршруты
