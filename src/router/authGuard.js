@@ -21,10 +21,14 @@ const matchesRule = (path, rule) => {
  * Проверяет аутентификацию перед переходом на защищённые страницы.
  *
  * Страница считается публичной, если выполняется хотя бы одно условие:
- *   - путь входит в DEFAULT_PUBLIC_ROUTES ('/', '/login', '/api-docs');
+ *   - путь входит в DEFAULT_PUBLIC_ROUTES ('/login');
  *   - путь подходит под одно из правил в options.publicRoutes;
  *   - у маршрута (или любого родительского) указано meta: { public: true };
  *   - путь совпадает с options.redirectTo (чтобы не было цикла редиректов).
+ *
+ * Перед редиректом на страницу логина сохраняет оригинальный URL в
+ * sessionStorage как `auth_return_url`, чтобы после успешной аутентификации
+ * вернуть пользователя обратно.
  *
  * @example
  *   // router/index.js
@@ -40,12 +44,12 @@ const matchesRule = (path, rule) => {
  *
  * @param {Object} [options]
  * @param {Array<string|RegExp|Function>} [options.publicRoutes=[]] - дополнительные публичные маршруты
- * @param {string} [options.redirectTo='/'] - куда отправлять неавторизованного пользователя
+ * @param {string} [options.redirectTo='/login'] - куда отправлять неавторизованного пользователя
  * @returns {Function} guard для Router.beforeEach
  */
 export const createAuthGuard = ({
                                     publicRoutes = [],
-                                    redirectTo = '/',
+                                    redirectTo = '/login',
                                 } = {}) => {
     const rules = [...DEFAULT_PUBLIC_ROUTES, redirectTo, ...publicRoutes]
 
@@ -62,6 +66,14 @@ export const createAuthGuard = ({
 
         const refreshed = await authStore.refreshAccessToken()
 
-        return refreshed ? true : redirectTo
+        if (refreshed) return true
+
+        // Сохраняем путь, куда пользователь пытался попасть, чтобы
+        // вернуть его после успешного логина.
+        if (to.path !== redirectTo) {
+            sessionStorage.setItem('auth_return_url', to.path)
+        }
+
+        return redirectTo
     }
 }

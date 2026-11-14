@@ -147,7 +147,7 @@ export const useAuthStore = defineStore('auth', {
 
           if (currentPath !== '/' && currentPath !== '/login') {
             console.info('[authStore] Redirecting to login page')
-            window.location.href = '/'
+                      window.location.href = '/login'
           }
 
           return false
